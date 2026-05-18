@@ -1,59 +1,38 @@
-#!/bin/bash
+# Oh My Zsh
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="agnoster"
 
-echo "Setting up dotfiles..."
+plugins=(
+    git
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    z
+    sudo
+)
 
-# Install dependencies dasar
-sudo pacman -S --noconfirm git zsh curl wget
+source $ZSH/oh-my-zsh.sh
 
-# Install Oh My Zsh
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    echo "Installing Oh My Zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-else
-    echo "Oh My Zsh already installed, skipping..."
-fi
+# Dotfiles alias
+alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
-# Install zsh plugins
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+# PATH
+export PATH="$HOME/.local/bin:$PATH"
 
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
-    echo "Installing zsh-autosuggestions..."
-    git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
-fi
+# Editor default
+export EDITOR="nvim"
+export VISUAL="nvim"
 
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
-    echo "Installing zsh-syntax-highlighting..."
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-fi
+# Alias umum
+alias ls='ls --color=auto'
+alias ll='ls -lah'
+alias grep='grep --color=auto'
+alias cls='clear'
 
-# Clone dotfiles
-if [ ! -d "$HOME/.dotfiles" ]; then
-    echo "Cloning dotfiles..."
-    git clone --bare https://github.com/andrewlunardi/dotfiles.git $HOME/.dotfiles
-else
-    echo "Dotfiles repo already exists, skipping..."
-fi
+# Alias Niri
+alias niri-reload='niri msg action reload-config'
 
-# Pakai function, bukan alias
-dotfiles() {
-    /usr/bin/git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" "$@"
-}
-
-# Checkout config
-dotfiles checkout 2>/dev/null || {
-    echo "Backing up existing configs..."
-    mkdir -p ~/.config-backup
-    dotfiles checkout 2>&1 | grep -E "\s+\." | awk '{print $1}' | xargs -I{} mv {} ~/.config-backup/{}
-    dotfiles checkout
-}
-
-dotfiles config --local status.showUntrackedFiles no
-
-# Set zsh sebagai default shell
-if [ "$SHELL" != "$(which zsh)" ]; then
-    echo "Setting zsh as default shell..."
-    chsh -s $(which zsh)
-fi
-
-echo "Done! Dotfiles installed."
-echo "Please restart your terminal or run: exec zsh"
+# History
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_DUPS
+setopt SHARE_HISTORY
