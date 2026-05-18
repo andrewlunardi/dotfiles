@@ -15,7 +15,7 @@ alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 dotfiles checkout 2>/dev/null || {
 	echo "Backing up existing configs..."
 	mkdir -p ~/.config-backup
-	dotfiles checkout 2>&1 | grep "\s+\." | awk {'print $1'} | xargs -I{} mv{} ~/.config-backup/{}
+	dotfiles checkout 2>&1 | grep "\s+\." | awk {'print $1'} | xargs -I{} mv {} ~/.config-backup/{}
 	dotfiles checkout
 }
 
